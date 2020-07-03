@@ -11,6 +11,8 @@
 #define STD_ASPECT 1.33
 #define WIDE_ASPECT 1.78
 #define FRAME_INTERVAL (1000 / 30)
+#define WINDOW_TITLE "Momo WebRTC Native Client"
+#define concat(first, second) first second
 
 SDLRenderer::SDLRenderer(int width, int height, bool fullscreen)
     : running_(true),
@@ -27,7 +29,7 @@ SDLRenderer::SDLRenderer(int width, int height, bool fullscreen)
   }
 
   window_ =
-      SDL_CreateWindow("Momo WebRTC Native Client", SDL_WINDOWPOS_CENTERED,
+      SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED,
                        SDL_WINDOWPOS_CENTERED, width_, height_,
                        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
   if (window_ == nullptr) {
@@ -84,6 +86,12 @@ void SDLRenderer::PollEvent() {
         break;
       case SDLK_q:
         std::raise(SIGTERM);
+        break;
+      case SDLK_a:
+        SDL_SetWindowTitle(window_, concat(WINDOW_TITLE, " [a]"));
+        break;
+      case SDLK_b:
+        SDL_SetWindowTitle(window_, concat(WINDOW_TITLE, " [b]"));
         break;
     }
   }
