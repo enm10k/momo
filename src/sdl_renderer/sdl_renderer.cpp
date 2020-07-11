@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <csignal>
+#include <SDL_image.h>
 
 #include "api/video/i420_buffer.h"
 #include "rtc_base/logging.h"
@@ -41,6 +42,9 @@ SDLRenderer::SDLRenderer(int width, int height, bool fullscreen)
   }
 
   thread_ = SDL_CreateThread(SDLRenderer::RenderThreadExec, "Render", this);
+
+  button_surface = IMG_Load("./html/mute.png");
+  button_texture = nullptr;
 }
 
 SDLRenderer::~SDLRenderer() {
@@ -89,6 +93,14 @@ void SDLRenderer::PollEvent() {
   }
   if (e.type == SDL_QUIT) {
     std::raise(SIGTERM);
+  } else if (e.type == SDL_MOUSEBUTTONUP) {
+    int mouse_position_x, mouse_position_y;
+    SDL_GetMouseState(&mouse_position_x, &mouse_position_y);
+    if ((width_ - button_src_rect.w) < mouse_position_x && (height_ - button_src_rect.h) < mouse_position_y) {
+      if (e.button.button == SDL_BUTTON_LEFT) {
+        SDL_Log("hoge");
+      }
+    }
   }
 }
 
@@ -143,8 +155,13 @@ int SDLRenderer::RenderThread() {
         // flip (自画像とか？)
         //SDL_RenderCopyEx(renderer_, texture, &image_rect, &draw_rect, 0, nullptr, SDL_FLIP_HORIZONTAL);
         SDL_RenderCopy(renderer_, texture, &image_rect, &draw_rect);
-
         SDL_DestroyTexture(texture);
+
+        if (button_texture == nullptr)  {
+          button_texture = SDL_CreateTextureFromSurface(renderer_, button_surface);
+        }
+        SDL_Rect button_dst_rect = {draw_rect.w - button_src_rect.w, draw_rect.h - button_src_rect.h, button_src_rect.w, button_src_rect.h};
+        SDL_RenderCopy(renderer_, button_texture, &button_src_rect, &button_dst_rect);
       }
       SDL_RenderPresent(renderer_);
 

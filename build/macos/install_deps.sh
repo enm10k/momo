@@ -136,3 +136,20 @@ if [ $SDL2_CHANGED -eq 1 -o ! -e $INSTALL_DIR/SDL2/lib/libSDL2.a ]; then
   popd
 fi
 echo $SDL2_VERSION > $SDL2_VERSION_FILE
+
+# rm -rf $SOURCE_DIR/SDL2_image
+# rm -rf $BUILD_DIR/SDL2_image
+# rm -rf $INSTALL_DIR/SDL2_image
+# mkdir -p $SOURCE_DIR/SDL2_image
+# mkdir -p $BUILD_DIR/SDL2_image
+# # TODO: SDL2_image のバージョンを VERSION_FILE で指定できるようにする
+# ../../script/setup_sdl2_image.sh 2.0.5 $SOURCE_DIR/SDL2_image
+# pushd $BUILD_DIR/SDL2_image
+#   SYSROOT="`xcrun --sdk macosx --show-sdk-path`"
+#   CC="$INSTALL_DIR/llvm/clang/bin/clang --sysroot=$SYSROOT" \
+#     CXX="$INSTALL_DIR/llvm/clang/bin/clang++ --sysroot=$SYSROOT -nostdinc++" \
+#     SDL2_CONFIG="$BUILD_DIR/SDL2/sdl2-config" \
+#     $SOURCE_DIR/SDL2_image/source/configure --disable-shared --prefix=$INSTALL_DIR/SDL2_image
+#   make -j$JOBS
+#   make install
+# popd
