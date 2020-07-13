@@ -73,32 +73,36 @@ void SDLRenderer::SetFullScreen(bool fullscreen) {
 void SDLRenderer::PollEvent() {
   SDL_Event e;
   // 必ずメインスレッドから呼び出す
-  SDL_PollEvent(&e);
-  if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_RESIZED &&
-      e.window.windowID == SDL_GetWindowID(window_)) {
-    rtc::CritScope lock(&sinks_lock_);
-    width_ = e.window.data1;
-    height_ = e.window.data2;
-    SetOutlines();
-  }
-  if (e.type == SDL_KEYUP) {
-    switch (e.key.keysym.sym) {
-      case SDLK_f:
-        SetFullScreen(!IsFullScreen());
-        break;
-      case SDLK_q:
-        std::raise(SIGTERM);
-        break;
+  while (SDL_PollEvent(&e)) {
+    if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_RESIZED &&
+        e.window.windowID == SDL_GetWindowID(window_)) {
+      rtc::CritScope lock(&sinks_lock_);
+      width_ = e.window.data1;
+      height_ = e.window.data2;
+      SetOutlines();
     }
-  }
-  if (e.type == SDL_QUIT) {
-    std::raise(SIGTERM);
-  } else if (e.type == SDL_MOUSEBUTTONUP) {
-    int mouse_position_x, mouse_position_y;
-    SDL_GetMouseState(&mouse_position_x, &mouse_position_y);
-    if ((width_ - button_src_rect.w) < mouse_position_x && (height_ - button_src_rect.h) < mouse_position_y) {
-      if (e.button.button == SDL_BUTTON_LEFT) {
-        SDL_Log("hoge");
+    if (e.type == SDL_KEYUP) {
+      switch (e.key.keysym.sym) {
+        case SDLK_f:
+          SetFullScreen(!IsFullScreen());
+          break;
+        case SDLK_q:
+          std::raise(SIGTERM);
+          break;
+      }
+    }
+    if (e.type == SDL_QUIT) {
+      std::raise(SIGTERM);
+    } else if (e.type == SDL_MOUSEBUTTONUP) {
+      int mouse_position_x, mouse_position_y;
+      SDL_GetMouseState(&mouse_position_x, &mouse_position_y);
+      if ((width_ - button_src_rect.w) < mouse_position_x && (height_ - button_src_rect.h) < mouse_position_y) {
+        if (e.button.button == SDL_BUTTON_LEFT && e.button.clicks == 1) {
+          if (rtc_manager_ != nullptr) {
+            rtc_manager_->SetAudioEnabled(!rtc_manager_->IsAudioEnabled());
+            rtc_manager_->SetVideoEnabled(!rtc_manager_->IsVideoEnabled());
+          }
+        }
       }
     }
   }

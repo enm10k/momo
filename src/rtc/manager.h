@@ -22,6 +22,26 @@ class RTCManager {
       webrtc::PeerConnectionInterface::RTCConfiguration rtc_config,
       RTCMessageSender* sender);
 
+  bool IsAudioEnabled() {
+    return (_audio_track != nullptr) && _audio_track->enabled();
+  };
+
+  bool IsVideoEnabled() {
+    return (_video_track != nullptr) && _video_track->enabled();
+  };
+
+  void SetAudioEnabled(bool enabled) {
+    if (_audio_track) {
+      _audio_track->set_enabled(enabled);
+    }
+  };
+
+  void SetVideoEnabled(bool enabled) {
+    if (_video_track) {
+      _video_track->set_enabled(enabled);
+    }
+  };
+
  private:
   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> _factory;
   rtc::scoped_refptr<webrtc::AudioTrackInterface> _audio_track;

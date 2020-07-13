@@ -12,6 +12,7 @@
 #include "api/scoped_refptr.h"
 #include "api/video/video_frame.h"
 #include "api/video/video_sink_interface.h"
+#include "rtc/manager.h"
 #include "rtc/video_track_receiver.h"
 #include "rtc_base/critical_section.h"
 
@@ -28,6 +29,9 @@ class SDLRenderer : public VideoTrackReceiver {
   void SetOutlines();
   void AddTrack(webrtc::VideoTrackInterface* track) override;
   void RemoveTrack(webrtc::VideoTrackInterface* track) override;
+  void SetRTCManager(RTCManager* rtc_manager) {
+    rtc_manager_ = rtc_manager;
+  };
 
  protected:
   class Sink : public rtc::VideoSinkInterface<webrtc::VideoFrame> {
@@ -91,6 +95,7 @@ class SDLRenderer : public VideoTrackReceiver {
   SDL_Surface* button_surface;
   SDL_Texture* button_texture;
   const SDL_Rect button_src_rect = {0, 0, 155, 55};
+  RTCManager* rtc_manager_;
 };
 
 #endif
