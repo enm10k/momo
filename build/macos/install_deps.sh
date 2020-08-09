@@ -136,3 +136,28 @@ if [ $SDL2_CHANGED -eq 1 -o ! -e $INSTALL_DIR/SDL2/lib/libSDL2.a ]; then
   popd
 fi
 echo $SDL2_VERSION > $SDL2_VERSION_FILE
+
+# SDL2_TTF
+SDL2_TTF_VERSION_FILE="$INSTALL_DIR/sdl2_ttf.version"
+SDL2_TTF_CHANGED=0
+if [ ! -e $SDL2_TTF_VERSION_FILE -o "$SDL2_TTF_VERSION" != "`cat $SDL2_TTF_VERSION_FILE`" ]; then
+  SDL2_TTF_CHANGED=1
+fi
+
+if [ $SDL2_TTF_CHANGED -eq 1 -o ! -e $INSTALL_DIR/SDL2_TTF/lib/libSDL2_TTF.a ]; then
+  rm -rf $SOURCE_DIR/SDL2_ttf
+  rm -rf $BUILD_DIR/SDL2_ttf
+  rm -rf $INSTALL_DIR/SDL2_ttf
+  mkdir -p $SOURCE_DIR/SDL2_ttf
+  mkdir -p $BUILD_DIR/SDL2_ttf
+  ../../script/setup_sdl2_ttf.sh $SDL2_TTF_VERSION $SOURCE_DIR/SDL2_ttf
+  pushd $BUILD_DIR/SDL2_ttf
+    SYSROOT="`xcrun --sdk macosx --show-sdk-path`"
+    CC="$INSTALL_DIR/llvm/clang/bin/clang --sysroot=$SYSROOT" \
+      CXX="$INSTALL_DIR/llvm/clang/bin/clang++ --sysroot=$SYSROOT -nostdinc++" \
+      $SOURCE_DIR/SDL2_ttf/source/configure --disable-shared --prefix=$INSTALL_DIR/SDL2_ttf
+    make -j$JOBS
+    make install
+  popd
+fi
+echo $SDL2_TTF_VERSION > $SDL2_TTF_VERSION_FILE
