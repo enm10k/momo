@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <csignal>
+#include <SDL_image.h>
 
 // WebRTC
 #include <api/video/i420_buffer.h>
@@ -41,6 +42,8 @@ SDLRenderer::SDLRenderer(int width, int height, bool fullscreen)
     SetFullScreen(true);
   }
 
+  button_surface_ = IMG_Load("./html/mute/png");
+  button_texture_ = nullptr;
   thread_ = SDL_CreateThread(SDLRenderer::RenderThreadExec, "Render", this);
 }
 
@@ -146,8 +149,13 @@ int SDLRenderer::RenderThread() {
         // flip (自画像とか？)
         //SDL_RenderCopyEx(renderer_, texture, &image_rect, &draw_rect, 0, nullptr, SDL_FLIP_HORIZONTAL);
         SDL_RenderCopy(renderer_, texture, &image_rect, &draw_rect);
-
         SDL_DestroyTexture(texture);
+
+        if (button_texture_ == nullptr) {
+          button_texture_ = SDL_CreateTextureFromSurface(renderer_, button_surface_);
+        }
+        SDL_Rect button_dst_rect = {draw_rect.w - button_src_rect_.w, draw_rect.h - button_src_rect_.h, button_src_rect_.w, button_src_rect_.h};
+        SDL_RenderCopy(renderer_, button_texture_, &button_src_rect_, &button_dst_rect);
       }
       SDL_RenderPresent(renderer_);
 
@@ -334,6 +342,10 @@ void SDLRenderer::SetOutlines() {
   }
   rows_ = rows;
   cols_ = cols;
+}
+
+void SDLRenderer::SetRTCManager(RTCManager* rtc_manager) {
+  rtc_manager_ = rtc_manager;
 }
 
 void SDLRenderer::AddTrack(webrtc::VideoTrackInterface* track) {

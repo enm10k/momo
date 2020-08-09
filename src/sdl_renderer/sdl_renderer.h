@@ -16,6 +16,7 @@
 #include <api/scoped_refptr.h>
 #include <api/video/video_frame.h>
 #include <api/video/video_sink_interface.h>
+#include <rtc/rtc_manager.h>
 #include <rtc/video_track_receiver.h>
 #include <rtc_base/critical_section.h>
 
@@ -30,6 +31,7 @@ class SDLRenderer : public VideoTrackReceiver {
   int RenderThread();
 
   void SetOutlines();
+  void SetRTCManager(RTCManager* rtc_manager);
   void AddTrack(webrtc::VideoTrackInterface* track) override;
   void RemoveTrack(webrtc::VideoTrackInterface* track) override;
 
@@ -92,6 +94,10 @@ class SDLRenderer : public VideoTrackReceiver {
   int height_;
   int rows_;
   int cols_;
+  SDL_Surface* button_surface_;
+  SDL_Texture* button_texture_;
+  const SDL_Rect button_src_rect_ = {0, 0, 155, 155};
+  RTCManager* rtc_manager_;
 };
 
 #endif
