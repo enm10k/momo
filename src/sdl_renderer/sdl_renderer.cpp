@@ -42,8 +42,8 @@ SDLRenderer::SDLRenderer(int width, int height, bool fullscreen)
     SetFullScreen(true);
   }
 
-  button_surface_ = IMG_Load("./html/mute.png");
-  button_texture_ = nullptr;
+  mute_button_surface_ = IMG_Load("./html/mute.png");
+  mute_button_texture_ = nullptr;
   thread_ = SDL_CreateThread(SDLRenderer::RenderThreadExec, "Render", this);
 }
 
@@ -70,6 +70,12 @@ void SDLRenderer::SetFullScreen(bool fullscreen) {
   SDL_ShowCursor(fullscreen ? SDL_DISABLE : SDL_ENABLE);
 }
 
+SDL_Rect SDLRenderer::GetMuteButtonDstRect() {
+  int window_width, window_height;
+  SDL_GetWindowSize(window_, &window_width, &window_height);
+  return {window_width - mute_button_src_rect_.w, window_height - mute_button_src_rect_.h, mute_button_src_rect_.w, mute_button_src_rect_.h};
+}
+
 void SDLRenderer::PollEvent() {
   SDL_Event e;
   // 必ずメインスレッドから呼び出す
@@ -90,6 +96,18 @@ void SDLRenderer::PollEvent() {
         case SDLK_q:
           std::raise(SIGTERM);
           break;
+      }
+    }
+    if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT) {
+      int mouse_position_x, mouse_position_y;
+      SDL_GetMouseState(&mouse_position_x, &mouse_position_y);
+
+      SDL_Rect button_dst_rect = GetMuteButtonDstRect();
+      if (button_dst_rect.x < mouse_position_x && button_dst_rect.y < mouse_position_y) {
+        if (rtc_manager_ != nullptr) {
+          rtc_manager_->SetAudioEnabled(!rtc_manager_->IsAudioEnabled());
+          rtc_manager_->SetVideoEnabled(!rtc_manager_->IsVideoEnabled());
+        }
       }
     }
     if (e.type == SDL_QUIT) {
@@ -151,21 +169,15 @@ int SDLRenderer::RenderThread() {
         SDL_RenderCopy(renderer_, texture, &image_rect, &draw_rect);
         SDL_DestroyTexture(texture);
 
-        if (button_texture_ == nullptr) {
-          button_texture_ = SDL_CreateTextureFromSurface(renderer_, button_surface_);
-        }
-
-        // int window_width, window_height;
-        // SDL_GetWindowSize(window_, &window_width, &window_height);
-        // SDL_Rect button_dst_rect = {window_width - button_src_rect_.w, window_height - button_src_rect_.h, button_src_rect_.w, button_src_rect_.h};
-        SDL_Rect button_dst_rect = {
-          sink->GetOffsetX() + sink->GetWidth() - button_src_rect_.w,
-          sink->GetOffsetY() + sink->GetHeight() - button_src_rect_.h,
-          button_src_rect_.w,
-          button_src_rect_.h
-        };
-        SDL_RenderCopy(renderer_, button_texture_, &button_src_rect_, &button_dst_rect);
       }
+
+
+      if (mute_button_texture_ == nullptr) {
+        mute_button_texture_ = SDL_CreateTextureFromSurface(renderer_, mute_button_surface_);
+      }
+      SDL_Rect button_dst_rect = GetMuteButtonDstRect();
+      SDL_RenderCopy(renderer_, mute_button_texture_, &mute_button_src_rect_, &button_dst_rect);
+
       SDL_RenderPresent(renderer_);
 
       if (dispatch_) {

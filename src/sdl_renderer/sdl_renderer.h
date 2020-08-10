@@ -78,6 +78,7 @@ class SDLRenderer : public VideoTrackReceiver {
  private:
   bool IsFullScreen();
   void SetFullScreen(bool fullscreen);
+  SDL_Rect GetMuteButtonDstRect();
   void PollEvent();
 
   rtc::CriticalSection sinks_lock_;
@@ -94,9 +95,9 @@ class SDLRenderer : public VideoTrackReceiver {
   int height_;
   int rows_;
   int cols_;
-  SDL_Surface* button_surface_;
-  SDL_Texture* button_texture_;
-  const SDL_Rect button_src_rect_ = {0, 0, 155, 55};
+  SDL_Surface* mute_button_surface_;
+  SDL_Texture* mute_button_texture_;
+  const SDL_Rect mute_button_src_rect_ = {0, 0, 155, 55};
   RTCManager* rtc_manager_;
 };
 
