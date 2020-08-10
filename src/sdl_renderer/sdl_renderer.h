@@ -96,7 +96,7 @@ class SDLRenderer : public VideoTrackReceiver {
   int cols_;
   SDL_Surface* button_surface_;
   SDL_Texture* button_texture_;
-  const SDL_Rect button_src_rect_ = {0, 0, 155, 155};
+  const SDL_Rect button_src_rect_ = {0, 0, 155, 55};
   RTCManager* rtc_manager_;
 };
 
