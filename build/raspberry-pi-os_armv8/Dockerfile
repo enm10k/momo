@@ -147,3 +147,22 @@ RUN \
     -DVIDEO_KMSDRM=OFF \
   && make -j`nproc` \
   && make install
+
+# SDL2_image のビルド
+
+ARG SDL2_IMAGE_VERSION
+
+COPY script/setup_sdl2_image.sh /root/
+RUN \
+  set -ex \
+  && /root/setup_sdl2_image.sh "$SDL2_IMAGE_VERSION" /root/sdl2-image-source \
+  && mkdir -p /root/sdl2-image-source/build \
+  && cd /root/sdl2-image-source/build \
+  && ../source/configure --help && SYSTEM_NAME=Linux \
+    SYSROOT=/root/rootfs \
+    CC=/root/llvm/clang/bin/clang \
+    SDL2_CONFIG="/root/SDL2/bin/sdl2-config" \
+    SDL_LIBS="/root/SDL2/lib" \
+    ../source/configure --disable-shared --prefix=/root/SDL2_image --with-sdl-prefix=/root/SDL2 \
+  && ../source/make -j`nproc` \
+  && ../source/make install
