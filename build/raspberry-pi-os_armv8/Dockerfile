@@ -153,16 +153,17 @@ RUN \
 ARG SDL2_IMAGE_VERSION
 
 COPY script/setup_sdl2_image.sh /root/
-RUN \
-  set -ex \
+# RUN cat /root/sdl2-source/build/config.log && exit -1
+RUN set -ex \
   && /root/setup_sdl2_image.sh "$SDL2_IMAGE_VERSION" /root/sdl2-image-source \
   && mkdir -p /root/sdl2-image-source/build \
   && cd /root/sdl2-image-source/build \
   && cat ../source/configure \
   && ../source/configure --help && SYSTEM_NAME=Linux \
-    SYSROOT=/root/rootfs \
     CC=/root/llvm/clang/bin/clang \
-    CFLAGS="-target aarch64-linux-gnu" \
+    CFLAGS="--target=aarch64-linux-gnu --sysroot=/root/rootfs" \
+    # QEMU_LD_PREFIX=/usr/aarch64-linux-gnu/ \
+    # LIBRARY_PATH="${LIBRARY_PATH}:/usr/lib/aarch64-linux-gnu" \
     SDL2_CONFIG=/root/SDL2/bin/sdl2-config \
     SDL_LIBS=/root/SDL2/lib \
     ../source/configure --disable-shared --prefix=/root/SDL2_image --with-sdl-prefix=/root/SDL2 \
