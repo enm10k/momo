@@ -172,6 +172,5 @@ RUN \
     --prefix=/root/SDL2_image \
     --host=x86_64-pc-linux-gnu \
     --with-sdl-prefix=/root/SDL2 \
-    --disable-sdltest \
   && make -j`nproc` \
   && make install

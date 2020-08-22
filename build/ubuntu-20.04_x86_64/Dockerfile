@@ -138,13 +138,11 @@ RUN \
   && cd /root/sdl2-image-source/build \
   && SYSTEM_NAME=Linux \
     CC=/root/llvm/clang/bin/clang \
-    CFLAGS="--sysroot=/root/rootfs" \
     LDFLAGS="-lX11 -lXext" \
     ../source/configure \
     --disable-shared \
     --prefix=/root/SDL2_image \
     --with-sdl-prefix=/root/SDL2 \
-    --disable-sdltest \
   && make -j`nproc` \
   && make install
 
