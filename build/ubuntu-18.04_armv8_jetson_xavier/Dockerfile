@@ -153,3 +153,25 @@ RUN \
   && make -j`nproc` \
   && make install
 
+# SDL2_image のビルド
+
+ARG SDL2_IMAGE_VERSION
+
+COPY script/setup_sdl2_image.sh /root/
+RUN \
+  set -ex \
+  && /root/setup_sdl2_image.sh "$SDL2_IMAGE_VERSION" /root/sdl2-image-source \
+  && mkdir -p /root/sdl2-image-source/build \
+  && cd /root/sdl2-image-source/build \
+  && SYSTEM_NAME=Linux \
+    CC=/root/llvm/clang/bin/clang \
+    CFLAGS="--target=aarch64-linux-gnu --sysroot=/root/rootfs" \
+    LDFLAGS="-lX11 -lXext" \
+    ../source/configure \
+    --disable-shared \
+    --prefix=/root/SDL2_image \
+    --host=x86_64-pc-linux-gnu \
+    --with-sdl-prefix=/root/SDL2 \
+    --disable-sdltest \
+  && make -j`nproc` \
+  && make install

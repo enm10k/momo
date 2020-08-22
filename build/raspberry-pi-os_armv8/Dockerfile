@@ -158,13 +158,10 @@ RUN \
   && /root/setup_sdl2_image.sh "$SDL2_IMAGE_VERSION" /root/sdl2-image-source \
   && mkdir -p /root/sdl2-image-source/build \
   && cd /root/sdl2-image-source/build \
-  # && ../source/configure --help \
   && SYSTEM_NAME=Linux \
     CC=/root/llvm/clang/bin/clang \
     CFLAGS="--target=aarch64-linux-gnu --sysroot=/root/rootfs" \
     LDFLAGS="-lX11 -lXext" \
-    # SDL2_CONFIG=/root/SDL2/bin/sdl2-config \
-    # SDL_LIBS=/root/SDL2/lib \
     ../source/configure \
     --disable-shared \
     --prefix=/root/SDL2_image \
