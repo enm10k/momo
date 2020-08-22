@@ -110,6 +110,37 @@ if (!(Test-Path "$INSTALL_DIR\SDL2\include\SDL2\SDL.h")) {
   Pop-Location
 }
 
+# SDL2_image のビルド
+
+if (!(Test-Path "$INSTALL_DIR\SDL2_image\include\SDL2\SDL_image.h")) {
+  $_URL = "https://www.libsdl.org/projects/SDL_image/release/SDL2_image-$SDL2_IMAGE_VERSION.zip"
+  $_FILE = "SDL2_image.zip"
+  # ダウンロードと展開
+  Push-Location $SOURCE_DIR
+    if (!(Test-Path $_FILE)) {
+      Invoke-WebRequest -Uri $_URL -OutFile $_FILE
+    }
+    Remove-Item SDL2 -Force -Recurse -ErrorAction Ignore
+    Remove-Item SDL2-$SDL2__IMAGE_VERSION -Force -Recurse -ErrorAction Ignore
+    # Expand-Archive -Path $_FILE -DestinationPath .
+    7z x $_FILE
+    Move-Item SDL2-$SDL2_IMAGE_VERSION SDL2_image
+  Pop-Location
+
+  mkdir $BUILD_DIR\SDL2_image -ErrorAction Ignore
+  Push-Location $BUILD_DIR\SDL2_image
+    cmake `
+      -G "Visual Studio 16 2019" `
+      -DFORCE_STATIC_VCRT=ON `
+      -DBUILD_SHARED_LIBS=OFF `
+      "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR_SLASH}/SDL2_image" `
+      $SOURCE_DIR\SDL2_image
+
+    cmake --build . --config Release
+    cmake --build . --config Release --target INSTALL
+  Pop-Location
+}
+
 
 # CLI11 の取得
 
