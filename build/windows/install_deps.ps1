@@ -121,7 +121,7 @@ if (!(Test-Path "$INSTALL_DIR\SDL2_image\include\SDL2\SDL_image.h")) {
       Invoke-WebRequest -Uri $_URL -OutFile $_FILE
     }
     Remove-Item SDL2 -Force -Recurse -ErrorAction Ignore
-    Remove-Item SDL2-$SDL2__IMAGE_VERSION -Force -Recurse -ErrorAction Ignore
+    Remove-Item SDL2_image-$SDL2__IMAGE_VERSION -Force -Recurse -ErrorAction Ignore
     # Expand-Archive -Path $_FILE -DestinationPath .
     7z x $_FILE
     Move-Item SDL2-$SDL2_IMAGE_VERSION SDL2_image
