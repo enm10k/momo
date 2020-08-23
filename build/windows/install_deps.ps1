@@ -110,6 +110,24 @@ if (!(Test-Path "$INSTALL_DIR\SDL2\include\SDL2\SDL.h")) {
   Pop-Location
 }
 
+# vsdevcmd.bat の設定を入れる
+# https://github.com/microsoft/vswhere/wiki/Find-VC
+if (!(Test-Path $BUILD_DIR\vswhere.exe)) {
+  Invoke-WebRequest -Uri "https://github.com/microsoft/vswhere/releases/download/2.8.4/vswhere.exe" -OutFile $BUILD_DIR\vswhere.exe
+}
+
+Push-Location $BUILD_DIR
+  $path = .\vswhere.exe -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+Pop-Location
+if ($path) {
+  $path = Join-Path $path 'Common7\Tools\vsdevcmd.bat'
+  if (Test-Path $path) {
+    cmd /s /c """$path"" $args && set" | Where-Object { $_ -match '(\w+)=(.*)' } | ForEach-Object {
+      $null = New-Item -force -path "Env:\$($Matches[1])" -value $Matches[2]
+    }
+  }
+}
+
 # SDL2_image のビルド
 
 if (!(Test-Path "$INSTALL_DIR\SDL2_image\include\SDL2\SDL_image.h")) {
