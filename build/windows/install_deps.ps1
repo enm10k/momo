@@ -129,15 +129,8 @@ if (!(Test-Path "$INSTALL_DIR\SDL2_image\include\SDL2\SDL_image.h")) {
 
   mkdir $BUILD_DIR\SDL2_image -ErrorAction Ignore
   Push-Location $BUILD_DIR\SDL2_image
-    cmake `
-      -G "Visual Studio 16 2019" `
-      -DFORCE_STATIC_VCRT=ON `
-      -DBUILD_SHARED_LIBS=OFF `
-      "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR_SLASH}/SDL2_image" `
-      $SOURCE_DIR\SDL2_image
-
-    cmake --build . --config Release
-    cmake --build . --config Release --target INSTALL
+    # C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild $SOURCE_DIR\SDL2_image\VisualC\SDL_image.sln
+    MSBuild $SOURCE_DIR\SDL2_image\VisualC\SDL_image.sln
   Pop-Location
 }
 
