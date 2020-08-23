@@ -410,9 +410,9 @@ if (USE_SDL2)
         ${SDL2_IMAGE_ROOT_DIR}/lib/libSDL2_image.a
     )
   else()
-    target_link_directories(momo PRIVATE ${SDL2_LIBDIR})
-    target_link_libraries(momo PRIVATE SDL2)
-    target_include_directories(momo PRIVATE "${SYSROOT}${SDL2_INCLUDE_DIRS}")
+    target_link_directories(momo PRIVATE ${SDL2_LIBDIR} ${SDL2_IMAGE_ROOT_DIR}/lib)
+    target_link_libraries(momo PRIVATE SDL2 SDL2_image)
+    target_include_directories(momo PRIVATE "${SYSROOT}${SDL2_INCLUDE_DIRS}" ${SDL2_IMAGE_ROOT_DIR}/include/SDL2)
   endif()
 
   if ("${TARGET_OS}" STREQUAL "macos")
