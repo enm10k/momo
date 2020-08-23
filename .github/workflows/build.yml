@@ -17,7 +17,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: warrenbuckley/Setup-MSBuild@v1
       - name: Get Versions
         run: |
           Get-Content "VERSION" | Foreach-Object {
