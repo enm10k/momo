@@ -110,48 +110,27 @@ if (!(Test-Path "$INSTALL_DIR\SDL2\include\SDL2\SDL.h")) {
   Pop-Location
 }
 
-# vsdevcmd.bat の設定を入れる
-# https://github.com/microsoft/vswhere/wiki/Find-VC
-if (!(Test-Path $BUILD_DIR\vswhere.exe)) {
-  Invoke-WebRequest -Uri "https://github.com/microsoft/vswhere/releases/download/2.8.4/vswhere.exe" -OutFile $BUILD_DIR\vswhere.exe
-}
-
-Push-Location $BUILD_DIR
-  $path = .\vswhere.exe -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
-Pop-Location
-if ($path) {
-  $path = Join-Path $path 'Common7\Tools\vsdevcmd.bat'
-  if (Test-Path $path) {
-    cmd /s /c """$path"" $args && set" | Where-Object { $_ -match '(\w+)=(.*)' } | ForEach-Object {
-      $null = New-Item -force -path "Env:\$($Matches[1])" -value $Matches[2]
-    }
-  }
-}
-
-# SDL2_image のビルド
+# SDL2_image の取得
+# ソースからのビルドを試みたが、ソリューション・ファイルが Visual Studio 2010 に利用していたため断念した
 
 if (!(Test-Path "$INSTALL_DIR\SDL2_image\include\SDL2\SDL_image.h")) {
-  $_URL = "https://www.libsdl.org/projects/SDL_image/release/SDL2_image-$SDL2_IMAGE_VERSION.zip"
-  $_FILE = "SDL2_image.zip"
-  # ダウンロードと展開
+  $_URL = "https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-$SDL2_IMAGE_VERSION-VC.zip"
+  $_FILE = "$SOURCE_DIR\SDL2_image.zip"
+  # ダウンロード
   Push-Location $SOURCE_DIR
     if (!(Test-Path $_FILE)) {
       Invoke-WebRequest -Uri $_URL -OutFile $_FILE
     }
-    Remove-Item SDL2_image -Force -Recurse -ErrorAction Ignore
-    Remove-Item SDL2_image-$SDL2_IMAGE_VERSION -Force -Recurse -ErrorAction Ignore
-    # Expand-Archive -Path $_FILE -DestinationPath .
-    7z x $_FILE
-    Move-Item SDL2_image-$SDL2_IMAGE_VERSION SDL2_image
   Pop-Location
-
-  mkdir $BUILD_DIR\SDL2_image -ErrorAction Ignore
-  Push-Location $BUILD_DIR\SDL2_image
-    # C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild $SOURCE_DIR\SDL2_image\VisualC\SDL_image.sln
-    MSBuild $SOURCE_DIR\SDL2_image\VisualC\SDL_image.sln
+  # 展開(=インストール)
+  Remove-Item $INSTALL_DIR\SDL2_image -Recurse -Force -ErrorAction Ignore
+  Remove-Item $INSTALL_DIR\SDL2_image-${SDL2_IMAGE_VERSION} -Recurse -Force -ErrorAction Ignore
+  # Expand-Archive -Path $_FILE -DestinationPath "$INSTALL_DIR"
+  Push-Location $INSTALL_DIR
+    7z x $_FILE
+    Move-Item SDL2_image-${SDL2_IMAGE_VERSION} SDL2_image
   Pop-Location
 }
-
 
 # CLI11 の取得
 

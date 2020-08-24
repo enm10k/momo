@@ -400,14 +400,20 @@ if (USE_SDL2)
     PRIVATE
       _THREAD_SAFE
   )
-  target_include_directories(momo PRIVATE ${SDL2_IMAGE_ROOT_DIR}/include/SDL2)
+
+  if ("${TARGET_OS}" STREQUAL "windows")
+    target_include_directories(momo PRIVATE ${SDL2_IMAGE_ROOT_DIR}/include)
+  else()
+    target_include_directories(momo PRIVATE ${SDL2_IMAGE_ROOT_DIR}/include/SDL2)
+  endif()
 
   if (TARGET SDL2::SDL2-static)
     target_link_libraries(momo
       PRIVATE
         SDL2::SDL2-static
         SDL2::SDL2main
-        ${SDL2_IMAGE_ROOT_DIR}/lib/libSDL2_image.a
+        # ${SDL2_IMAGE_ROOT_DIR}/lib/libSDL2_image.a
+        ${SDL2_IMAGE_ROOT_DIR}/lib/x64/SDL2_image.lib
     )
   else()
     target_link_directories(momo PRIVATE ${SDL2_LIBDIR} ${SDL2_IMAGE_ROOT_DIR}/lib)
